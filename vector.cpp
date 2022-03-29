@@ -5,24 +5,24 @@ using namespace std;
 template<class T>
 class myvector{
 private:
-	T* _start; // Êı¾İÍ·
-	T* _end; // Êı¾İÄ©Î²
-	T* _endofspace; // ´æ´¢¿Õ¼äµÄÄ©Î² 
+	T* _start; // æ•°æ®å¤´
+	T* _end; // æ•°æ®æœ«å°¾
+	T* _endofspace; // å­˜å‚¨ç©ºé—´çš„æœ«å°¾ 
 public:
-	// ¹¹Ôìº¯Êı
+	// æ„é€ å‡½æ•°
 	myvector(): _start(nullptr), _end(nullptr), _endofspace(nullptr) {}
 	
 	myvector(size_t n, const T& val=T()): _start(nullptr), _end(nullptr), _endofspace(nullptr){
-		reserve(n); // À©Èİ
+		reserve(n); // æ‰©å®¹
 		while (n--){
 			push_back(val);
 		} 
 	}
 	myvector(const myvector& v): _start(nullptr), _end(nullptr), _endofspace(nullptr){
-		// À©Èİ 
+		// æ‰©å®¹ 
 		reserve(v.capacity());
-		// ±éÀú¿½±´Êı¾İ
-		// ÎÊÌâ£ºÎªÉ¶±ØĞëÊ¹ÓÃ cbegin() 
+		// éå†æ‹·è´æ•°æ®
+		// é—®é¢˜ï¼šä¸ºå•¥å¿…é¡»ä½¿ç”¨ cbegin() 
 		const T* iter = v.cbegin();
 		const T* end = v.cend();
 		while(iter != end){
@@ -40,16 +40,16 @@ public:
 	
 	
 	// .begin()
-	// ·µ»ØÖ¸ÏòµÚÒ»¸öÊı¾İµÄÖ¸Õë
+	// è¿”å›æŒ‡å‘ç¬¬ä¸€ä¸ªæ•°æ®çš„æŒ‡é’ˆ
 	T* begin(){
 		return _start;
 	}
 	// .end()
-	// ·µ»ØÖ¸ÏòÄ©Î²Êı¾İµÄÖ¸Õë 
+	// è¿”å›æŒ‡å‘æœ«å°¾æ•°æ®çš„æŒ‡é’ˆ 
 	T* end(){
 		return _end;
 	}
-	// ·µ»Øconst Ö¸Õë 
+	// è¿”å›const æŒ‡é’ˆ 
 	const T* cbegin() const{
 		return _start;
 	}
@@ -58,21 +58,21 @@ public:
 		return _end;
 	}
 	// .size()
-	// ·µ»ØÓĞĞ§Êı¾İµÄ´óĞ¡
+	// è¿”å›æœ‰æ•ˆæ•°æ®çš„å¤§å°
 	size_t size() const {
 		return _end - _start;
 	} 
 	// .capacity()
-	// ·µ»ØÈİÁ¿´óĞ¡ 
+	// è¿”å›å®¹é‡å¤§å° 
 	size_t capacity() const {
 		return _endofspace - _start;
 	}
 	
 
-	// ÔÚÄ©Î²Ìí¼ÓÒ»¸öÖµ 
+	// åœ¨æœ«å°¾æ·»åŠ ä¸€ä¸ªå€¼ 
 	void push_back(const T& val){
 		if (_end == _endofspace){
-			// ¿Õ¼ä²»×ã£¬ĞèÒª¶ş´Î·ÖÅä
+			// ç©ºé—´ä¸è¶³ï¼Œéœ€è¦äºŒæ¬¡åˆ†é…
 			size_t newspace = _endofspace == nullptr ? 1 : 2 * capacity();
 			reserve(newspace);
 		}
@@ -80,31 +80,31 @@ public:
 		_end++;
 	}
 	
-	// ÔÚposÇ°²åÈëÒ»¸öÖµ 
+	// åœ¨poså‰æ’å…¥ä¸€ä¸ªå€¼ 
 	T* insert(T* pos, const T& val){
 		if (_end == _endofspace){
-			// ĞèÒªÀ©Èİ
+			// éœ€è¦æ‰©å®¹
 			size_t sz = pos - _start;
 			size_t newspace = capacity() == 0 ? 2 : capacity() * 2;
 			reserve(newspace);
 			pos = _start + sz; 
 		}
 		T* last = _end - 1;
-		// ÏòºóÒÆ¶¯Êı¾İ 
+		// å‘åç§»åŠ¨æ•°æ® 
 		while (pos <= last){
 			*(last+1) = *last;
 			last--;
 		}
-		// ²åÈëÊı¾İ
+		// æ’å…¥æ•°æ®
 		*pos = val;
 		_end++;
 		return pos;
 	}
-	// ÔÚposÇ°²åÈën¸öÏàÍ¬µÄÖµ 
+	// åœ¨poså‰æ’å…¥nä¸ªç›¸åŒçš„å€¼ 
 	T* insert(T* pos, size_t n, const T& val){
-		// ÔÚÖ¸¶¨ÔªËØÇ°²åÈën¸öval
+		// åœ¨æŒ‡å®šå…ƒç´ å‰æ’å…¥nä¸ªval
 		if (size()+n > capacity()){
-			// ĞèÒªÀ©Èİ
+			// éœ€è¦æ‰©å®¹
 			size_t sz = pos - _start;
 //			size_t newspace = capacity() == 0 ? n : capacity() * 2;
 			size_t newspace = capacity();
@@ -121,12 +121,12 @@ public:
 		}
 		T* last = _end - 1;
 		_end += n;
-		// ÏòºóÒÆ¶¯Êı¾İ 
+		// å‘åç§»åŠ¨æ•°æ® 
 		while (pos <= last){
 			*(last+n) = *last;
 			last--;
 		}
-		// ²åÈëÊı¾İ
+		// æ’å…¥æ•°æ®
 		while (n--){
 			*pos = val;
 			pos++;
@@ -135,10 +135,10 @@ public:
 		return pos;
 		
 	}
-	// ÔÚposÇ°£¬²åÈëÁíÒ»¸öÍ¬ÀàĞÍmyvector [left,right)Çø¼äÄÚµÄÖµ 
+	// åœ¨poså‰ï¼Œæ’å…¥å¦ä¸€ä¸ªåŒç±»å‹myvector [left,right)åŒºé—´å†…çš„å€¼ 
 	T* insert(T* pos, const T* left, const T* right){
-		// Ö¸¶¨ÔªËØÇ°£¬²åÈëÁíÒ»¸öÏàÍ¬ÀàĞÍvector
-		// [first, last) Çø¼äÄÚµÄÔªËØ
+		// æŒ‡å®šå…ƒç´ å‰ï¼Œæ’å…¥å¦ä¸€ä¸ªç›¸åŒç±»å‹vector
+		// [first, last) åŒºé—´å†…çš„å…ƒç´ 
 //		cout<<*left<<" "<<*right<<endl;
 //		cout<<size()<<endl;
 		size_t n = 0;
@@ -147,7 +147,7 @@ public:
 			n++;
 		}
 		if (size()+n > capacity()){
-			// ĞèÒªÀ©Èİ
+			// éœ€è¦æ‰©å®¹
 			size_t sz = pos - _start;
 //			size_t newspace = capacity() == 0 ? n : capacity() * 2;
 			size_t newspace = capacity();
@@ -169,7 +169,7 @@ public:
 			*(last+n) = *last;
 			last--;
 		}
-		// ²åÈëÊı¾İ
+		// æ’å…¥æ•°æ®
 		while(n--){
 			*pos = *left;
 			pos++;
@@ -178,26 +178,26 @@ public:
 		return pos;
 	}
 	
-	// É¾³ı×îºóÒ»¸öÖµ 
+	// åˆ é™¤æœ€åä¸€ä¸ªå€¼ 
 	void pop_back() {
-		// É¾³ı×îºóÒ»¸öÔªËØ
+		// åˆ é™¤æœ€åä¸€ä¸ªå…ƒç´ 
 		if (_end != _start)
 			_end--; 
 	}
 	
 	void clear(){
-		// Çå¿ÕËùÓĞÔªËØ 
+		// æ¸…ç©ºæ‰€æœ‰å…ƒç´  
 		if (_start == nullptr){
 			return;
 		}
 		delete [] _start;
 		_start = _endofspace = _end = nullptr;
 	}
-	// É¾³ıposÎ»ÖÃµÄÖµ 
+	// åˆ é™¤posä½ç½®çš„å€¼ 
 	T* erase(T* pos){
-		// É¾³ıÖ¸ÏòµÄÔªËØ
+		// åˆ é™¤æŒ‡å‘çš„å…ƒç´ 
 		T* tmp = pos + 1;
-		// posºó±ßµÄÊı¾İ£¬ÒÀ´ÎÏòÇ°
+		// posåè¾¹çš„æ•°æ®ï¼Œä¾æ¬¡å‘å‰
 		while (tmp != _end){
 			*(tmp - 1) = *tmp;
 			tmp++;
@@ -205,9 +205,9 @@ public:
 		_end--;
 		return pos;
 	}
-	// É¾³ı[left,right)Çø¼äµÄÖµ 
+	// åˆ é™¤[left,right)åŒºé—´çš„å€¼ 
 	T* erase(T* left, T* right){
-		// É¾³ı [left, right) ÖĞµÄÔªËØ
+		// åˆ é™¤ [left, right) ä¸­çš„å…ƒç´ 
 //		T* tmp = right;
 		while (right != _end){
 			*left = *right;
@@ -217,56 +217,56 @@ public:
 		_end = left;
 		return _end;
 	}
-	// ·µ»ØµÚÒ»¸öÔªËØÖµ 
+	// è¿”å›ç¬¬ä¸€ä¸ªå…ƒç´ å€¼ 
 	T& front(){
 		return *_start;
 	}
-	// ·µ»Ø×îºóÒ»¸öÔªËØµÄÖµ 
+	// è¿”å›æœ€åä¸€ä¸ªå…ƒç´ çš„å€¼ 
 	T& back(){
 		return *(_end - 1);
 	}
-	// ÅĞ¶ÏÊÇ·ñÎª¿Õ 
+	// åˆ¤æ–­æ˜¯å¦ä¸ºç©º 
 	bool empty() {
 		return _start == _end;
 	} 
-	// ÖØĞÂ¸ü¸ÄÓĞĞ§Êı¾İµÄ´óĞ¡ 
+	// é‡æ–°æ›´æ”¹æœ‰æ•ˆæ•°æ®çš„å¤§å° 
 	void resize(size_t n, const T& val=T()){
 		cout<<size()<<" "<<capacity()<<endl;
 		if (n > size()){
-			// n´óÓÚÓĞĞ§Êı¾İ³¤¶È
+			// nå¤§äºæœ‰æ•ˆæ•°æ®é•¿åº¦
 			if (n > capacity()){
-				// À©Èİ
+				// æ‰©å®¹
 				reserve(n); 
 			}
 //			T* last = _start + n*sizeof(T);
 			T* last = _start + n;
-			// ¶àÓà²¿·ÖÊ¹ÓÃÄ¬ÈÏÖµÌî³ä 
+			// å¤šä½™éƒ¨åˆ†ä½¿ç”¨é»˜è®¤å€¼å¡«å…… 
 			while (_end != last){
 				*_end = val;
 				_end++;
 			}
 		} else {
-			// ½Ø¶Ï 
+			// æˆªæ–­ 
 			_end = _start + n*sizeof(T);
 		}
 	}
-	// ¸ü¸ÄÈİÁ¿µÄ´óĞ¡ 
+	// æ›´æ”¹å®¹é‡çš„å¤§å° 
 	void reserve(size_t n){
-		// À©Èİ
+		// æ‰©å®¹
 		if (n > capacity()){
 			size_t sz = size();
 			T* tmp = new T[n];
 			for (size_t i = 0; i < sz; i++){
 				tmp[i] = _start[i];
 			}
-			// É¾³ı¾É¿Õ¼ä
+			// åˆ é™¤æ—§ç©ºé—´
 			delete [] _start;
 			_start = tmp;
 			_end = _start + sz;
 			_endofspace = _start + n; 
 		} 
 	}
-	// ÖØÔØ [] ÔËËã·û 
+	// é‡è½½ [] è¿ç®—ç¬¦ 
 	T& operator[] (size_t pos){
 		if (pos < size()){
 			return _start[pos];
@@ -274,7 +274,7 @@ public:
 			exit(1);
 		}
 	}
-	// Îö¹¹º¯Êı 
+	// ææ„å‡½æ•° 
 	~myvector(){
 		if (_start){
 			delete [] _start;
@@ -284,7 +284,7 @@ public:
 };
 
 int main(){
-	// ¹¹Ôì·½Ê½²âÊÔ 
+	// æ„é€ æ–¹å¼æµ‹è¯• 
 	myvector<int> nums(10, 3);
 	for (int i = 0; i<10; i++){
 		cout<<nums[i];
@@ -314,7 +314,7 @@ int main(){
 	s.erase(s.begin());
 	cout<<s[0]<<endl;
 	
-	// ÆäËû
+	// å…¶ä»–
 	myvector<int> numo;
 	for (int i=0; i<10; i++){
 		numo.push_back(i);
@@ -339,7 +339,7 @@ int main(){
 	cout<<endl;
 	cout<<numo.front()<<" "<<numo.back()<<endl;
 	cout<<numo.empty()<<endl;
-	// capacity ÓĞÎÊÌâ 
+	// capacity æœ‰é—®é¢˜ 
 	cout<<numo.size()<<" "<<numo.capacity()<<endl;
 	
 	//resize
