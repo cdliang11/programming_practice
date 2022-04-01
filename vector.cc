@@ -152,7 +152,7 @@ class myvector {
       reserve(newspace);
       pos = _start + sz;
     }
-    //		cout<<size()<<" "<<capacity()<<endl;
+    // cout<<size()<<" "<<capacity()<<endl;
     T* last = _end - 1;
     _end += n;
     while (pos <= last) {
@@ -221,7 +221,7 @@ class myvector {
         // 扩容
         reserve(n);
       }
-      //			T* last = _start + n*sizeof(T);
+      // T* last = _start + n*sizeof(T);
       T* last = _start + n;
       // 多余部分使用默认值填充
       while (_end != last) {
