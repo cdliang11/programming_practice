@@ -3,4 +3,4 @@
 - [x] c++ vector
 - [x] c++ map
 - [x] 统计词频 （python)
-- [ ] filter_scp.py 实现 （filter_scp.pl） 
+- [x] filter_scp.py 实现 （filter_scp.pl） 
