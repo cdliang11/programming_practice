@@ -3,24 +3,20 @@
 using namespace std;
 
 template <class T>
-class myvector {
- private:
-  T* _start;       // 数据头
-  T* _end;         // 数据末尾
-  T* _endofspace;  // 存储空间的末尾
+class MyVector {
  public:
   // 构造函数
-  myvector() : _start(nullptr), _end(nullptr), _endofspace(nullptr) {}
+  MyVector() : start_(nullptr), end_(nullptr), endofspace_(nullptr) {}
 
-  myvector(size_t n, const T& val = T())
-      : _start(nullptr), _end(nullptr), _endofspace(nullptr) {
+  MyVector(size_t n, const T& val = T())
+      : start_(nullptr), end_(nullptr), endofspace_(nullptr) {
     reserve(n);  // 扩容
     while (n--) {
       push_back(val);
     }
   }
-  myvector(const myvector& v)
-      : _start(nullptr), _end(nullptr), _endofspace(nullptr) {
+  MyVector(const MyVector& v)
+      : start_(nullptr), end_(nullptr), endofspace_(nullptr) {
     // 扩容
     reserve(v.capacity());
     // 遍历拷贝数据
@@ -28,13 +24,13 @@ class myvector {
     const T* iter = v.cbegin();
     const T* end = v.cend();
     while (iter != end) {
-      *_end = *iter;
-      _end++;
+      *end_ = *iter;
+      end_++;
       iter++;
     }
   }
-  myvector(T* _begin, T* _last)
-      : _start(nullptr), _end(nullptr), _endofspace(nullptr) {
+  MyVector(T* _begin, T* _last)
+      : start_(nullptr), end_(nullptr), endofspace_(nullptr) {
     while (_begin != _last) {
       push_back(*_begin);
       _begin++;
@@ -43,42 +39,42 @@ class myvector {
 
   // .begin()
   // 返回指向第一个数据的指针
-  T* begin() { return _start; }
+  T* begin() { return start_; }
   // .end()
   // 返回指向末尾数据的指针
-  T* end() { return _end; }
+  T* end() { return end_; }
   // 返回const 指针
-  const T* cbegin() const { return _start; }
+  const T* cbegin() const { return start_; }
 
-  const T* cend() const { return _end; }
+  const T* cend() const { return end_; }
   // .size()
   // 返回有效数据的大小
-  size_t size() const { return _end - _start; }
+  size_t size() const { return end_ - start_; }
   // .capacity()
   // 返回容量大小
-  size_t capacity() const { return _endofspace - _start; }
+  size_t capacity() const { return endofspace_ - start_; }
 
   // 在末尾添加一个值
   void push_back(const T& val) {
-    if (_end == _endofspace) {
+    if (end_ == endofspace_) {
       // 空间不足，需要二次分配
-      size_t newspace = _endofspace == nullptr ? 1 : 2 * capacity();
+      size_t newspace = endofspace_ == nullptr ? 1 : 2 * capacity();
       reserve(newspace);
     }
-    *_end = val;
-    _end++;
+    *end_ = val;
+    end_++;
   }
 
   // 在pos前插入一个值
   T* insert(T* pos, const T& val) {
-    if (_end == _endofspace) {
+    if (end_ == endofspace_) {
       // 需要扩容
-      size_t sz = pos - _start;
+      size_t sz = pos - start_;
       size_t newspace = capacity() == 0 ? 2 : capacity() * 2;
       reserve(newspace);
-      pos = _start + sz;
+      pos = start_ + sz;
     }
-    T* last = _end - 1;
+    T* last = end_ - 1;
     // 向后移动数据
     while (pos <= last) {
       *(last + 1) = *last;
@@ -86,7 +82,7 @@ class myvector {
     }
     // 插入数据
     *pos = val;
-    _end++;
+    end_++;
     return pos;
   }
   // 在pos前插入n个相同的值
@@ -94,7 +90,7 @@ class myvector {
     // 在指定元素前插入n个val
     if (size() + n > capacity()) {
       // 需要扩容
-      size_t sz = pos - _start;
+      size_t sz = pos - start_;
       // size_t newspace = capacity() == 0 ? n :
       // capacity() * 2;
       size_t newspace = capacity();
@@ -107,10 +103,10 @@ class myvector {
         }
       }
       reserve(newspace);
-      pos = _start + sz;
+      pos = start_ + sz;
     }
-    T* last = _end - 1;
-    _end += n;
+    T* last = end_ - 1;
+    end_ += n;
     // 向后移动数据
     while (pos <= last) {
       *(last + n) = *last;
@@ -121,10 +117,10 @@ class myvector {
       *pos = val;
       pos++;
     }
-    //		_end+=n;
+    //		end_+=n;
     return pos;
   }
-  // 在pos前，插入另一个同类型myvector [left,right)区间内的值
+  // 在pos前，插入另一个同类型MyVector [left,right)区间内的值
   T* insert(T* pos, const T* left, const T* right) {
     // 指定元素前，插入另一个相同类型vector
     // [first, last) 区间内的元素
@@ -137,7 +133,7 @@ class myvector {
     }
     if (size() + n > capacity()) {
       // 需要扩容
-      size_t sz = pos - _start;
+      size_t sz = pos - start_;
       //			size_t newspace = capacity() == 0 ? n :
       // capacity() * 2;
       size_t newspace = capacity();
@@ -150,11 +146,11 @@ class myvector {
         }
       }
       reserve(newspace);
-      pos = _start + sz;
+      pos = start_ + sz;
     }
     // cout<<size()<<" "<<capacity()<<endl;
-    T* last = _end - 1;
-    _end += n;
+    T* last = end_ - 1;
+    end_ += n;
     while (pos <= last) {
       *(last + n) = *last;
       last--;
@@ -171,47 +167,47 @@ class myvector {
   // 删除最后一个值
   void pop_back() {
     // 删除最后一个元素
-    if (_end != _start) _end--;
+    if (end_ != start_) end_--;
   }
 
   void clear() {
     // 清空所有元素
-    if (_start == nullptr) {
+    if (start_ == nullptr) {
       return;
     }
-    delete[] _start;
-    _start = _endofspace = _end = nullptr;
+    delete[] start_;
+    start_ = endofspace_ = end_ = nullptr;
   }
   // 删除pos位置的值
   T* erase(T* pos) {
     // 删除指向的元素
     T* tmp = pos + 1;
     // pos后边的数据，依次向前
-    while (tmp != _end) {
+    while (tmp != end_) {
       *(tmp - 1) = *tmp;
       tmp++;
     }
-    _end--;
+    end_--;
     return pos;
   }
   // 删除[left,right)区间的值
   T* erase(T* left, T* right) {
     // 删除 [left, right) 中的元素
     //		T* tmp = right;
-    while (right != _end) {
+    while (right != end_) {
       *left = *right;
       left++;
       right++;
     }
-    _end = left;
-    return _end;
+    end_ = left;
+    return end_;
   }
   // 返回第一个元素值
-  T& front() { return *_start; }
+  T& front() { return *start_; }
   // 返回最后一个元素的值
-  T& back() { return *(_end - 1); }
+  T& back() { return *(end_ - 1); }
   // 判断是否为空
-  bool empty() { return _start == _end; }
+  bool empty() { return start_ == end_; }
   // 重新更改有效数据的大小
   void resize(size_t n, const T& val = T()) {
     cout << size() << " " << capacity() << endl;
@@ -221,16 +217,16 @@ class myvector {
         // 扩容
         reserve(n);
       }
-      // T* last = _start + n*sizeof(T);
-      T* last = _start + n;
+      // T* last = start_ + n*sizeof(T);
+      T* last = start_ + n;
       // 多余部分使用默认值填充
-      while (_end != last) {
-        *_end = val;
-        _end++;
+      while (end_ != last) {
+        *end_ = val;
+        end_++;
       }
     } else {
       // 截断
-      _end = _start + n * sizeof(T);
+      end_ = start_ + n * sizeof(T);
     }
   }
   // 更改容量的大小
@@ -240,72 +236,77 @@ class myvector {
       size_t sz = size();
       T* tmp = new T[n];
       for (size_t i = 0; i < sz; i++) {
-        tmp[i] = _start[i];
+        tmp[i] = start_[i];
       }
       // 删除旧空间
-      delete[] _start;
-      _start = tmp;
-      _end = _start + sz;
-      _endofspace = _start + n;
+      delete[] start_;
+      start_ = tmp;
+      end_ = start_ + sz;
+      endofspace_ = start_ + n;
     }
   }
-  // swap 交换两个myvector
-  void swap(myvector& v) {
+  // swap 交换两个MyVector
+  void swap(MyVector& v) {
     // 交换各自的地址信息
-    std::swap(_start, v._start);
-    std::swap(_end, v._end);
-    std::swap(_endofspace, v._endofspace);
+    std::swap(start_, v.start_);
+    std::swap(end_, v.end_);
+    std::swap(endofspace_, v.endofspace_);
   }
   // 重载 = 运算符
-  myvector& operator=(myvector& v) {
-    swap(v);  // myvector内部实现
+  MyVector& operator=(MyVector& v) {
+    swap(v);  // MyVector内部实现
     return *this;
   }
   // 重载 [] 运算符
   T& operator[](size_t pos) {
     if (pos < size()) {
-      return _start[pos];
+      return start_[pos];
     } else {
       exit(1);
     }
   }
   // 析构函数
-  ~myvector() {
-    if (_start) {
-      delete[] _start;
-      _start = _end = _endofspace = nullptr;
+  ~MyVector() {
+    if (start_) {
+      delete[] start_;
+      start_ = end_ = endofspace_ = nullptr;
     }
   }
+
+ private:
+  T* start_;       // 数据头
+  T* end_;         // 数据末尾
+  T* endofspace_;  // 存储空间的末尾
 };
 
 int main() {
   // 构造方式测试
-  myvector<int> nums(10, 3);
+  MyVector<int> nums(10, 3);
   cout << "nums: ";
   for (int i = 0; i < 10; i++) {
     cout << nums[i];
   }
   cout << endl;
-  myvector<int> nums1(10);
+  MyVector<int> nums1(10);
   cout << "nums1: ";
   for (int n : nums1) {
     cout << n;
   }
   cout << endl;
-  myvector<int> nums2(nums);
+  MyVector<int> nums2(nums);
   cout << "nums2: ";
   for (int n : nums2) {
     cout << n;
   }
   cout << endl;
-  myvector<int> nums3(nums.begin() + 2, nums.end());
+  MyVector<int> nums3(nums.begin() + 2, nums.end());
   cout << "nums3: ";
   for (int n : nums3) {
     cout << n;
   }
   cout << endl;
   // push_back
-  myvector<string> s;
+  MyVector<string> s;
   cout << "push_back: ";
   s.push_back("abcd");
   cout << s[0] << endl;
@@ -317,7 +318,7 @@ int main() {
   cout << s[0] << endl;
 
   // 其他
-  myvector<int> numo;
+  MyVector<int> numo;
   cout << "numo :";
   for (int i = 0; i < 10; i++) {
     numo.push_back(i);
@@ -373,7 +374,7 @@ int main() {
   cout << endl;
   // 测试 = 运算符
   cout << "nums4 = nums1: ";
-  myvector<int> nums4 = nums1;
+  MyVector<int> nums4 = nums1;
   for (int n : nums4) {
     cout << n;
   }
