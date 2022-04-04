@@ -83,13 +83,14 @@ lines_in_scp = in_scp.readlines()
 # print()
 if field == 1:
     for line in lines_in_scp:
+        line = line.strip()
         if re.search(r"\s*(\s+)\s*", line) is None:
             print("Bad line {}, could not get first field.".format(line))
             sys.exit(1)
         uttr = re.findall(r"\s*(\S+)\s*", line)[0]
 
         if (~exclude and seen[uttr]) or (exclude and ~(seen[uttr])):
-            print(uttr)
+            print(line)
 
 else:
     for line in lines_in_scp:
@@ -99,8 +100,8 @@ else:
             print("Invalid scp file line {}".format(line))
         if len(A) < field:
             print("Invalid scp file line {}".format(line))
-        if (~exclude and seen[A[field - 1]]) or (exclude
-                                                 and ~(seen[A[field - 1]])):
-            print(A[field - 1])
+        if (~exclude and seen[A[field - 1]]) or (
+                    exclude and ~(seen[A[field - 1]])):
+            print(line)
 
 in_scp.close()
