@@ -14,12 +14,12 @@ struct HashNode {
 };
 
 template <class K>
-struct hashFunction {
+struct HashFunction {
   size_t operator()(const K& key) { return key; }
 };
 
 template <>
-struct hashFunction<std::string> {
+struct HashFunction<std::string> {
   size_t operator()(const std::string& key) {
     // https://www.cnblogs.com/-clq/archive/2012/05/31/2528153.html
     // BKDR Hash 字符串转哈希
@@ -31,10 +31,10 @@ struct hashFunction<std::string> {
   }
 };
 
-template <class K, class V, class KOfV, class Hash = hashFunction<K>>
+template <class K, class V, class KOfV, class Hash = HashFunction<K>>
 class HashTable;
 
-template <class K, class V, class KOfV, class Hash = hashFunction<K>>
+template <class K, class V, class KOfV, class Hash = HashFunction<K>>
 struct HashIterator {
   // 定义迭代器
   typedef HashTable<K, V, KOfV, Hash> HT;
@@ -54,15 +54,15 @@ struct HashIterator {
     } else {
       // 这个桶结束，接着寻找下一个
       KOfV kov;
-      size_t idx = kov(_node->_val) % _hptr->_tables.size();
+      size_t idx = kov(_node->_val) % _hptr->tables_.size();
       idx++;
-      for (; idx < _hptr->_tables.size(); idx++) {
-        if (_hptr->_tables[idx]) {
-          _node = _hptr->_tables[idx];
+      for (; idx < _hptr->tables_.size(); idx++) {
+        if (_hptr->tables_[idx]) {
+          _node = _hptr->tables_[idx];
           break;
         }
       }
-      if (idx == _hptr->_tables.size()) {
+      if (idx == _hptr->tables_.size()) {
         _node = nullptr;
       }
     }
@@ -80,17 +80,17 @@ struct HashIterator {
 template <class K, class V, class KOfV, class Hash>
 class HashTable {
  public:
-  // template <class K, class V, class KOfV, class Hash = hashFunction<K>>
+  // template <class K, class V, class KOfV, class Hash = HashFunction<K>>
   // struct HashIterator;
   typedef HashIterator<K, V, KOfV, Hash> iterator;
   typedef HashNode<V> Node;
-  HashTable(int n = 10) : _tables(n), _n(0) {}
+  HashTable(int n = 10) : tables_(n), n_(0) {}
 
   //.begin()
   iterator begin() {
-    for (size_t i = 0; i < _tables.size(); i++) {
-      if (_tables[i]) {
-        return iterator(_tables[i], this);
+    for (size_t i = 0; i < tables_.size(); i++) {
+      if (tables_[i]) {
+        return iterator(tables_[i], this);
       }
     }
     return iterator(nullptr, this);
@@ -101,8 +101,8 @@ class HashTable {
   iterator find(const K& key) {
     KOfV kov;
     Hash hfunc;
-    for (size_t i = 0; i < _tables.size(); i++) {
-      Node* cur = _tables[i];
+    for (size_t i = 0; i < tables_.size(); i++) {
+      Node* cur = tables_[i];
       while (cur) {
         if (hfunc(kov(cur->_val)) == key) {
           return iterator(cur, this);
@@ -117,15 +117,15 @@ class HashTable {
     KOfV kov;
     Hash hfunc;
     // 除留余数法
-    int idx = key % _tables.size();
-    Node* cur = _tables[idx];
+    int idx = key % tables_.size();
+    Node* cur = tables_[idx];
     Node* prev = nullptr;
     if (hfunc(kov(cur->_val)) == key) {
       Node* next = cur->_next;
-      _tables[idx] = cur->_next;
+      tables_[idx] = cur->_next;
       delete cur;
       cur = nullptr;
-      _n--;
+      n_--;
       return iterator(next, this);
     }
     while (cur) {
@@ -134,7 +134,7 @@ class HashTable {
       if (hfunc(kov(cur->_val)) == key) {
         prev->_next = cur->_next;
         delete cur;
-        _n--;
+        n_--;
         return iterator(next, this);
       }
       cur = cur->_next;
@@ -147,11 +147,11 @@ class HashTable {
     Hash hfunc;
     KOfV kov;
     // 负载因子到1的时候扩容
-    if (_n == _tables.size()) {
-      int newsize = _n == 0 ? 10 : _n * 2;
+    if (n_ == tables_.size()) {
+      int newsize = n_ == 0 ? 10 : n_ * 2;
       std::vector<Node*> newtable(newsize);
-      for (size_t i = 0; i < _tables.size(); i++) {
-        Node* cur = _tables[i];
+      for (size_t i = 0; i < tables_.size(); i++) {
+        Node* cur = tables_[i];
         // 拷贝到新表
         while (cur) {
           Node* next = cur->_next;
@@ -160,13 +160,13 @@ class HashTable {
           newtable[idx] = cur;
           cur = next;
         }
-        _tables[i] = nullptr;
+        tables_[i] = nullptr;
       }
-      swap(_tables, newtable);
+      swap(tables_, newtable);
     }
 
-    int idx = hfunc(kov(val)) % _tables.size();
-    Node* cur = _tables[idx];
+    int idx = hfunc(kov(val)) % tables_.size();
+    Node* cur = tables_[idx];
     while (cur) {
       if (kov(cur->_val) == kov(val)) {
         return std::make_pair(iterator(cur, this), false);  // 已经存在
@@ -174,15 +174,15 @@ class HashTable {
       cur = cur->_next;
     }
     cur = new Node(val);
-    cur->_next = _tables[idx];
-    _tables[idx] = cur;
-    _n++;
+    cur->_next = tables_[idx];
+    tables_[idx] = cur;
+    n_++;
     return std::make_pair(iterator(cur, this), true);
   }
 
  private:
-  std::vector<Node*> _tables;
-  size_t _n = 0;  // 有效数据的个数
+  std::vector<Node*> tables_;
+  size_t n_ = 0;  // 有效数据的个数
 };
 }  // namespace hashtable_bucket
 
@@ -200,12 +200,12 @@ struct HashData {
 };
 
 template <class K>
-struct hashFunction {
+struct HashFunction {
   size_t operator()(const K& key) { return key; }
 };
 
 template <>
-struct hashFunction<std::string> {
+struct HashFunction<std::string> {
   size_t operator()(const std::string& key) {
     // https://www.cnblogs.com/-clq/archive/2012/05/31/2528153.html
     // BKDR Hash 字符串转哈希
@@ -217,28 +217,25 @@ struct hashFunction<std::string> {
   }
 };
 
-template <class K, class V, class Hash = hashFunction<K>>
+template <class K, class V, class Hash = HashFunction<K>>
 class HashTable {
- private:
-  std::vector<HashData<K, V>> _tables;
-  size_t _n = 0;  // 存储的数据个数
  public:
   // 查找
   HashData<K, V>* find(const K& key) {
-    if (_tables.size() == 0) {
+    if (tables_.size() == 0) {
       return nullptr;  // 空表
     }
     Hash hashfunc;  // 键值转换函数
-    size_t start = hashfunc(key) % _tables.size();
+    size_t start = hashfunc(key) % tables_.size();
     size_t i = 0;
     size_t idx = start + i;
-    while (_tables[idx]._status != EMPTY) {
-      if (_tables[idx]._kv.first == key && _tables[idx]._status == FULL) {
-        return &_tables[idx];
+    while (tables_[idx]._status != EMPTY) {
+      if (tables_[idx]._kv.first == key && tables_[idx]._status == FULL) {
+        return &tables_[idx];
       } else {
         i++;
         idx = start + i * i;  // 二次探测
-        idx %= _tables.size();
+        idx %= tables_.size();
       }
     }
     return nullptr;
@@ -250,33 +247,33 @@ class HashTable {
       return false;
     }
     // 扩容
-    if (_tables.size() == 0 || _n * 10 / _tables.size() >= 7) {
-      size_t newsize = _tables.size() == 0 ? 10 : _tables.size() * 2;
+    if (tables_.size() == 0 || n_ * 10 / tables_.size() >= 7) {
+      size_t newsize = tables_.size() == 0 ? 10 : tables_.size() * 2;
       HashTable<K, V> newHashTable;
-      newHashTable._tables.resize(newsize);
+      newHashTable.tables_.resize(newsize);
       // 扩容后，将元素位置重排，避免堆积
       // 利用额外一个新表
-      for (auto& t : _tables) {
+      for (auto& t : tables_) {
         if (t._status == FULL) {
           newHashTable.insert(t._kv);
         }
       }
-      _tables.swap(newHashTable._tables);
+      tables_.swap(newHashTable.tables_);
     }
     Hash hashfunc;
-    size_t start = hashfunc(kv.first) % _tables.size();
+    size_t start = hashfunc(kv.first) % tables_.size();
     size_t i = 0;
     size_t idx = start + i;
     // 冲突后，继续查找下一个
-    while (_tables[idx]._status == FULL) {
+    while (tables_[idx]._status == FULL) {
       i++;
       idx = start + i * i;
-      idx %= _tables.size();
+      idx %= tables_.size();
     }
     // 找到空位，插入
-    _tables[idx]._kv = kv;
-    _tables[idx]._status = FULL;
-    _n++;
+    tables_[idx]._kv = kv;
+    tables_[idx]._status = FULL;
+    n_++;
 
     return true;
   }
@@ -288,10 +285,14 @@ class HashTable {
       return false;
     } else {
       tmp->_status = DELETE;
-      _n--;
+      n_--;
       return true;
     }
   }
+
+ private:
+  std::vector<HashData<K, V>> tables_;
+  size_t n_ = 0;  // 存储的数据个数
 };
 }  // namespace hashtable_close
 

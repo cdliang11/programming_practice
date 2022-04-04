@@ -15,24 +15,24 @@ class unordered_map {
   typedef hashtable_bucket::HashTable<K, std::pair<K, V>, KeyOfValue> HT;
   typedef typename hashtable_bucket::HashTable<
       K, std::pair<K, V>, KeyOfValue,
-      hashtable_bucket::hashFunction<K>>::iterator iterator;
+      hashtable_bucket::HashFunction<K>>::iterator iterator;
   std::pair<iterator, bool> insert(const std::pair<K, V>& val) {
-    return _tables.insert(val);
+    return tables_.insert(val);
   }
-  iterator begin() { return _tables.begin(); }
-  iterator end() { return _tables.end(); }
+  iterator begin() { return tables_.begin(); }
+  iterator end() { return tables_.end(); }
   // 运算符重载
   V& operator[](const K& key) {
-    // iterator res = _tables.find(key);
+    // iterator res = tables_.find(key);
     // return res->second;
-    std::pair<iterator, bool> res = _tables.insert(std::make_pair(key, V()));
+    std::pair<iterator, bool> res = tables_.insert(std::make_pair(key, V()));
     return res.first->second;
   }
-  iterator find(const K& key) { return _tables.find(key); }
-  iterator erase(const K& key) { return _tables.erase(key); }
+  iterator find(const K& key) { return tables_.find(key); }
+  iterator erase(const K& key) { return tables_.erase(key); }
 
  private:
-  HT _tables;
+  HT tables_;
 };
 }  // namespace my_map
 
